@@ -1,0 +1,22 @@
+{
+    "name": "ebenefuenf/chuck-i18n",
+    "description": "Chuck framework nternationalization/gettext helper scripts",
+    "version": "0.1.0",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.1",
+    },
+    "autoload": {
+        "psr-4": {
+            "Chuck\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Chuck\\Tests\\": "tests"
+        }
+    }
+}
