@@ -1,22 +1,46 @@
 {
-    "name": "ebenefuenf/chuck-i18n",
-    "description": "Chuck framework nternationalization/gettext helper scripts",
-    "version": "0.1.0",
+    "name": "conia/i18n",
+    "description": "Conia internationalization/gettext helper scripts",
     "type": "library",
     "license": "MIT",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "require": {
-        "php": ">=8.1",
-    },
+    "authors": [
+        {
+            "name": "ebene fünf GmbH",
+            "email": "conia@ebenefuenf.de",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://conia.dev/i18n",
+    "keywords": [
+        "conia",
+        "internationalization",
+        "i18n",
+        "translation",
+        "gettext"
+    ],
     "autoload": {
         "psr-4": {
-            "Chuck\\": "src"
+            "Conia\\I18n\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Chuck\\Tests\\": "tests"
+            "Conia\\I18n\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "php": ">=8.1",
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.21",
+        "vimeo/psalm": "^4.24",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+        "staabm/annotate-pull-request-from-checkstyle": "^1.8"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }
