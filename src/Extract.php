@@ -39,6 +39,7 @@ class Extract extends Command
             ' --from-code=UTF-8' .
             ($join ? ' --join-existing' : '') .
             " --language=$type" .
+            " --package-name=$domain" .
             " --default-domain=$domain" .
             " --output=$potfile";
 
@@ -47,7 +48,7 @@ class Extract extends Command
 
     public function run(): int
     {
-        $this->checkXgettext();
+        $this->checkShellCommand('xgettext');
         $this->validateDir($this->dir);
         $this->validateDomain($this->domain);
 
