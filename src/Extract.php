@@ -43,7 +43,7 @@ class Extract extends Command
             " --default-domain=$domain" .
             " --output=$potfile";
 
-        passthru($cmd);
+        system($cmd);
     }
 
     public function run(): int
@@ -76,5 +76,11 @@ class Extract extends Command
         }
 
         return 0;
+    }
+
+    public function help(): void
+    {
+        $this->helpHeader(withOptions: true);
+        $this->helpOption('-l <locale>, --locale <locale>', 'Sets the target locale');
     }
 }
