@@ -2,42 +2,46 @@
 
 declare(strict_types=1);
 
-namespace Chuck\Cli\I18n;
+namespace Conia\I18n;
 
-use Chuck\Cli\Command;
-use Chuck\ConfigInterface;
+use Conia\Cli\Command;
 
 
-class UpdateCatalog extends Command
+class Update extends Command
 {
-    public static string $group = 'General';
-    public static string $title = 'Run test suite';
+    use Validates;
 
-    public function run(ConfigInterface $config, string ...$args): void
+    protected string $name = 'update';
+    protected string $group = 'Internationalization/gettext';
+    protected string $prefix = 'i18n';
+    protected string $description = 'Updates all existing translations catalogs based on a POT template';
+
+    public function __construct(
+        protected readonly string $dir,
+        protected readonly string $domain
+    ) {
+    }
+
+    public function run(): int
     {
-        $rootDir = $config->path()->root;
-        $command = $args[0] ?? null;
+        $this->validateDir($this->dir);
+        $this->validateDomain($this->domain);
 
-        if ($command === 'theme') {
-            $path = "$rootDir/www/theme/locale";
-            $appName = 'theme';
-        } else {
-            $path = "$rootDir/locale";
-            $appName = 'elearn';
-        }
+        $dir = $this->dir;
+        $domain = $this->domain;
 
-        $localeDirs = array_filter(glob("$path/*"), 'is_dir');
-        $locales = array_map(fn ($dir) => basename($dir), $localeDirs);
-
-        $command = $args[0] ?? null;
+        $localeDirs = array_filter(glob($this->dir . '/*'), 'is_dir');
+        $locales = array_map(fn ($locale) => basename($locale), $localeDirs);
 
         foreach ($locales as $locale) {
-            passthru(
+            system(
                 "msgmerge " .
                     "  --no-fuzzy-matching" .
-                    "  --update $path/$locale/LC_MESSAGES/$appName.po" .
-                    "  $path/$appName.pot"
+                    "  --update $dir/$locale/LC_MESSAGES/$domain.po" .
+                    "  $dir/$domain.pot"
             );
         };
+
+        return 0;
     }
 }
