@@ -15,6 +15,7 @@ $runner = new Runner(I18n::commands(
         new Source(__DIR__ . '/tests/fixtures', '*.php', 'PHP'),
         new Source(__DIR__ . '/tests/fixtures', '*.js', 'Javascript'),
     ],
+    jsonDir: __DIR__ . '/tmp/json',
 ));
 
 exit($runner->run());

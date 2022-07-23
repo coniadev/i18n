@@ -2,64 +2,83 @@
 
 declare(strict_types=1);
 
-namespace Chuck\Cli\I18n;
+namespace Conia\I18n;
 
-use Chuck\Cli\Command;
-use Chuck\ConfigInterface;
+use Conia\Cli\Command;
 
-
-class CompileCatalog extends Command
+class Compile extends Command
 {
-    public static string $group = 'I18N';
-    public static string $title = 'Compile *.po files to *.mo files';
-    public static string $desc = '';
+    use Validates;
 
-    public function run(ConfigInterface  $config,  string  ...$args): void
+    protected string $name = 'compile';
+    protected string $group = 'Internationalization/gettext';
+    protected string $prefix = 'i18n';
+    protected string $description = 'Takes a message catalog from a PO file and compiles it to a binary MO file';
+
+    public function __construct(
+        protected readonly string $dir,
+        protected readonly string $domain,
+        protected readonly ?string $jsonDir = null,
+    ) {
+    }
+
+    protected function getPo2Json(): string
     {
-        $rootDir = $config->path()->root;
-        $command = $args[0] ?? null;
+        $script = 'node_modules/.bin/po2json';
 
-        if ($command === 'theme') {
-            $path = "$rootDir/www/theme/locale";
-            $outDir = "$rootDir/www/theme/locale";
-            $appName = 'theme';
-        } else {
-            $path = "$rootDir/locale";
-            $outDir = "$rootDir/www/locale";
-            if ($command === null) {
-                $appName = 'elearn';
-            } else {
-                $appName = $args[0];
-            }
+        if (is_file($script)) {
+            return $script;
         }
 
-        $localeDirs = array_filter(glob("$path/*"), 'is_dir');
-        $locales = array_map(fn ($dir) => basename($dir), $localeDirs);
+        $this->checkShellCommand('po2json');
+        return 'po2json';
+    }
+
+    public function run(): int
+    {
+        $this->checkShellCommand('msgfmt');
+        $this->validateDir($this->dir);
+        $this->validateDomain($this->domain);
+
+        if ($this->jsonDir) {
+            $this->checkShellCommand('po2json');
+            $this->validateDir($this->jsonDir);
+        }
+
+        $dir = $this->dir;
+        $jsonDir = $this->jsonDir;
+        $domain = $this->domain;
+
+        $localeDirs = array_filter(glob($this->dir . '/*'), 'is_dir');
+        $locales = array_map(fn ($locale) => basename($locale), $localeDirs);
 
         foreach ($locales as $locale) {
-            $inputFile = "$path/$locale/LC_MESSAGES/$appName.po";
-            echo "Compile locale '$locale'\n";
-            echo "  $inputFile\n";
+            $inputFile = "$dir/$locale/LC_MESSAGES/$domain.po";
+            $this->echo("Compile locale '$locale'\n");
+            $this->echo("  $inputFile\n");
 
-            passthru(
+            system(
                 "msgfmt $inputFile " .
-                    "--output-file=$path/$locale/LC_MESSAGES/$appName.mo"
-
+                    "--output-file=$dir/$locale/LC_MESSAGES/$domain.mo"
             );
 
-            $outFile = "$outDir/$locale/messages.json";
-            echo "Compile '$locale' json file for frontend\n";
-            echo "  $outFile\n";
+            if ($jsonDir) {
+                $outFile = "$jsonDir/$locale/$domain.json";
+                $this->echo("Compile '$locale' json file for frontend\n");
+                $this->echo("  $outFile\n");
 
-            if (!is_dir("$outDir/$locale")) {
-                mkdir("$outDir/$locale", 0755, true);
+                if (!is_dir("$jsonDir/$locale")) {
+                    mkdir("$jsonDir/$locale", 0755, true);
+                }
+
+                $cmd = $this->getPo2Json() .
+                    " $dir/$locale/LC_MESSAGES/$domain.po" .
+                    " $outFile";
+
+                system($cmd);
             }
-
-            passthru(
-                "node_modules/.bin/po2json-gettextjs " .
-                    "$path/$locale/LC_MESSAGES/$appName.po $outFile"
-
-            );
         };
+
+        return 0;
     }
 }

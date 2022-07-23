@@ -15,7 +15,7 @@ class Init extends Command
     protected string $name = 'init';
     protected string $group = 'Internationalization/gettext';
     protected string $prefix = 'i18n';
-    protected string $description = 'Initializes a new locale/language';
+    protected string $description = 'Initializes a new translation catalog based on a POT template';
 
     public function __construct(
         protected readonly string $dir,
