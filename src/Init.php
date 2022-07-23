@@ -2,41 +2,78 @@
 
 declare(strict_types=1);
 
-namespace Chuck\Cli\I18n;
+namespace Conia\I18n;
 
-use Chuck\Cli\Command;
-use Chuck\ConfigInterface;
+use Conia\Cli\Command;
+use Conia\Cli\Opts;
+use RuntimeException;
 
-
-class InitCatalog extends Command
+class Init extends Command
 {
-    public static string $group = 'I18N';
-    public static string $title = 'Extract gettext() calls from source files';
-    public static string $desc = 'pass the locale e. g. `php run init-catalog en`';
+    use Validates;
 
-    public function run(ConfigInterface $config, string ...$args): void
+    protected string $name = 'init';
+    protected string $group = 'Internationalization/gettext';
+    protected string $prefix = 'i18n';
+    protected string $description = 'Initializes a new locale/language';
+
+    public function __construct(
+        protected readonly string $dir,
+        protected readonly string $domain
+    ) {
+    }
+
+    protected function getPotFile(): string
     {
-        $rootDir = $config->path()->root;
-        $command = $args[0] ?? null;
+        $potfile = $this->dir . '/' . $this->domain . '.pot';
 
-        if ($command === 'theme') {
-            $path = "$rootDir/www/theme/locale";
-            $appName = 'theme';
-            $locale = $args[1];
-        } else {
-            $path = "$rootDir/locale";
-            $appName = 'elearn';
-            $locale = $args[0];
+        if (is_file($potfile)) {
+            return $potfile;
         }
 
-        passthru("mkdir -p $path/$locale/LC_MESSAGES");
-        passthru(
-            "msginit " .
-                "  --locale $locale " .
-                "  --input $path/$appName.pot " .
-                "  --output $path/$locale/LC_MESSAGES/$appName.po"
+        throw new RuntimeException(
+            'The *.pot file is missing. You need to run the i18n:extract ' .
+                'command before initializing a catalog'
         );
     }
-}
 
-return new InitCatalog();
+    public function run(): int
+    {
+        $this->checkShellCommand('msginit');
+        $this->validateDir($this->dir);
+        $this->validateDomain($this->domain);
+
+        $dir = $this->dir;
+        $domain = $this->domain;
+        $potfile = $this->getPotFile();
+
+        $opts = new Opts();
+        $locale = $opts->get('-l', $opts->get('--locale', ''));
+
+        if (empty($locale)) {
+            // Would stop the test suit and wait for input
+            // @codeCoverageIgnoreStart
+            $locale = readline('Enter new locale (e. g. en, de_DE): ');
+            // @codeCoverageIgnoreEnd
+        }
+
+
+        $messages = "$dir/$locale/LC_MESSAGES";
+        $cmd = "msginit " .
+            " --no-translator" .
+            " --locale $locale" .
+            " --input $potfile" .
+            " --output $messages/$domain.po";
+
+        system("mkdir -p $messages");
+        system($cmd);
+
+        return 1;
+    }
+
+    public function help(): void
+    {
+        $this->helpHeader(withOptions: true);
+        $this->helpOption('-l <locale>, --locale <locale>', 'Sets the target locale');
+    }
+}
