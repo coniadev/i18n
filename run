@@ -1,0 +1,22 @@
+<?php 
+
+declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Conia\Cli\Runner;
+use Conia\I18n\I18n;
+use Conia\I18n\Source;
+
+$runner = new Runner(I18n::commands(
+    dir: __DIR__ . '/tmp/locale',
+    domain: 'testdomain',
+    sources: [
+        new Source(__DIR__ . '/tests/fixtures', '*.php', 'PHP'),
+        new Source(__DIR__ . '/tests/fixtures', '*.js', 'Javascript'),
+    ],
+));
+
+exit($runner->run());
+
+// vim: ft=php
