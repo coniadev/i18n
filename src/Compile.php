@@ -31,6 +31,7 @@ class Compile extends Command
         }
 
         $this->checkShellCommand('po2json');
+
         return 'po2json';
     }
 
