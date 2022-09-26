@@ -6,6 +6,6 @@ class AnotherClass
 {
     public function method()
     {
-        return _('This is the string');
+        return __('This is the string');
     }
 }

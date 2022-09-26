@@ -9,7 +9,7 @@ class Source
     public function __construct(
         public readonly string $dir,
         public readonly string $glob,
-        public readonly string $type
+        public readonly string $language,
     ) {
     }
 }

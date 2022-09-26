@@ -25,7 +25,7 @@ class Extract extends Command
     protected function extract(
         string $srcdir,
         string $glob,
-        string $type,
+        string $language,
         string $domain,
         string $potfile,
         bool $join,
@@ -37,8 +37,21 @@ class Extract extends Command
         $cmd = "find $srcdir" . $find . " '$glob' | xargs " .
             'xgettext' .
             ' --from-code=UTF-8' .
+            " --language=$language" .
             ($join ? ' --join-existing' : '') .
-            " --language=$type" .
+            " --keyword=" . // disable default keyword spec
+            " --keyword=__" .
+            " --keyword=_gettext" .
+            " --keyword=_dgettext:2" .
+            " --keyword=_d:2" .
+            " --keyword=_dcgettext:2" .
+            " --keyword=_dc:2" .
+            " --keyword=_ngettext:1,2" .
+            " --keyword=_n:1,2 " .
+            " --keyword=_dngettext:2,3" .
+            " --keyword=_dn:2,3 " .
+            " --keyword=_dcngettext:2,3" .
+            " --keyword=_dcn:2,3" .
             " --package-name=$domain" .
             " --default-domain=$domain" .
             " --output=$potfile";
@@ -55,10 +68,6 @@ class Extract extends Command
         $joinExisting = false;
         $potfile = $this->dir . '/' . $this->domain . '.pot';
 
-        if (is_file($potfile)) {
-            $joinExisting = true;
-        }
-
         foreach ($this->sources as $source) {
             echo 'Extracting ' . $source->glob . ' from ' . $source->dir . "\n";
             $this->validateDir($source->dir);
@@ -66,7 +75,7 @@ class Extract extends Command
             $this->extract(
                 $source->dir,
                 $source->glob,
-                $source->type,
+                $source->language,
                 $this->domain,
                 $potfile,
                 $joinExisting,

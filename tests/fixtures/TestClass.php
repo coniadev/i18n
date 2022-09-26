@@ -6,6 +6,6 @@ class TestClass
 {
     public function __construct()
     {
-        $this->str = _('Teststring');
+        $this->str = __('Teststring');
     }
 }

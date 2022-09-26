@@ -1,4 +1,4 @@
 let obj = {
-    test: _('Javascript test string'),
-    test2: _('Javascript test string 2'),
+    test: __('Javascript test string'),
+    test2: _n('Javascript plural single', 'Javascript plural plural', 2),
 };
