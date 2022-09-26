@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Conia\I18n;
 
 use Conia\Cli\Commands;
+use PhpMyAdmin\MoTranslator;
 
 class I18n
 {
@@ -24,15 +25,15 @@ class I18n
 
     public static function setupGettext(string $locale, array $domains, string $default): void
     {
-        setlocale(LC_ALL, $locale);
+        MoTranslator\Loader::loadFunctions();
+
+        _setlocale(LC_MESSAGES, $locale);
 
         foreach ($domains as $domain => $dir) {
-            if (!bindtextdomain($domain, $dir)) {
-                throw new \ErrorException('gettext error: bindtextdomain failed');
-            }
+            _bindtextdomain($domain, $dir);
+            _bind_textdomain_codeset($domain, 'UTF-8');
         }
 
-        // Set the default domain
-        textdomain($default);
+        _textdomain($default);
     }
 }
