@@ -19,7 +19,8 @@ class Init extends Command
 
     public function __construct(
         protected readonly string $dir,
-        protected readonly string $domain
+        protected readonly string $domain,
+        protected readonly array $params,
     ) {
     }
 
@@ -60,10 +61,17 @@ class Init extends Command
 
         $messages = "$dir/$locale/LC_MESSAGES";
         $cmd = "msginit " .
-            " --no-translator" .
-            " --locale $locale" .
-            " --input $potfile" .
-            " --output $messages/$domain.po";
+            " --locale=$locale" .
+            " --input=$potfile" .
+            " --output-file=$messages/$domain.po";
+
+        foreach ($this->params as $param => $value) {
+            if (str_starts_with('--', $param)) {
+                $cmd .= ' ' . $param . ($value ? '=' . $value : '');
+            } else {
+                $cmd .= ' ' . trim($param . ' ' . ($value ?? ''));
+            }
+        }
 
         system("mkdir -p $messages");
         system($cmd);

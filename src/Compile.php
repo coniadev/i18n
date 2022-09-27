@@ -19,6 +19,7 @@ class Compile extends Command
         protected readonly string $dir,
         protected readonly string $domain,
         protected readonly ?string $jsonDir = null,
+        protected readonly array $params,
     ) {
     }
 
@@ -57,11 +58,17 @@ class Compile extends Command
             $inputFile = "$dir/$locale/LC_MESSAGES/$domain.po";
             $this->echo("Compile locale '$locale'\n");
             $this->echo("  $inputFile\n");
+            $cmd = "msgfmt --output-file=$dir/$locale/LC_MESSAGES/$domain.mo";
 
-            system(
-                "msgfmt $inputFile " .
-                    "--output-file=$dir/$locale/LC_MESSAGES/$domain.mo"
-            );
+            foreach ($this->params as $param => $value) {
+                if (str_starts_with('--', $param)) {
+                    $cmd .= ' ' . $param . ($value ? '=' . $value : '');
+                } else {
+                    $cmd .= ' ' . trim($param . ' ' . ($value ?? ''));
+                }
+            }
+
+            system($cmd . " $inputFile");
 
             if ($jsonDir) {
                 $outFile = "$jsonDir/$locale/$domain.json";

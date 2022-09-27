@@ -19,6 +19,7 @@ class Extract extends Command
         protected string $dir,
         protected string $domain,
         protected readonly array $sources,
+        protected readonly array $params,
     ) {
     }
 
@@ -60,6 +61,14 @@ class Extract extends Command
             " --default-domain=$domain" .
             " --output=$potfile";
 
+        foreach ($this->params as $param => $value) {
+            if (str_starts_with('--', $param)) {
+                $cmd .= ' ' . $param . ($value ? '=' . $value : '');
+            } else {
+                $cmd .= ' ' . trim($param . ' ' . ($value ?? ''));
+            }
+        }
+
         system($cmd);
     }
 
@@ -85,7 +94,9 @@ class Extract extends Command
                 $joinExisting,
             );
 
-            $joinExisting = true;
+            if (is_file($potfile)) {
+                $joinExisting = true;
+            }
         }
 
         return 0;

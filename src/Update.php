@@ -18,7 +18,8 @@ class Update extends Command
 
     public function __construct(
         protected readonly string $dir,
-        protected readonly string $domain
+        protected readonly string $domain,
+        protected readonly array $params,
     ) {
     }
 
@@ -34,12 +35,18 @@ class Update extends Command
         $locales = array_map(fn ($locale) => basename($locale), $localeDirs);
 
         foreach ($locales as $locale) {
-            system(
-                "msgmerge " .
-                    "  --no-fuzzy-matching" .
-                    "  --update $dir/$locale/LC_MESSAGES/$domain.po" .
-                    "  $dir/$domain.pot"
-            );
+            $cmd = "msgmerge " .
+                " --update $dir/$locale/LC_MESSAGES/$domain.po";
+
+            foreach ($this->params as $param => $value) {
+                if (str_starts_with('--', $param)) {
+                    $cmd .= ' ' . $param . ($value ? '=' . $value : '');
+                } else {
+                    $cmd .= ' ' . trim($param . ' ' . ($value ?? ''));
+                }
+            }
+
+            system($cmd . " $dir/$domain.pot");
         };
 
         return 0;

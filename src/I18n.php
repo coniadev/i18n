@@ -14,12 +14,13 @@ class I18n
         string $domain,
         array $sources,
         ?string $jsonDir = null,
+        array $params = [],
     ): Commands {
         return new Commands([
-            new Extract($dir, $domain, $sources),
-            new Init($dir, $domain),
-            new Update($dir, $domain),
-            new Compile($dir, $domain, $jsonDir),
+            new Extract($dir, $domain, $sources, $params['xgettext'] ?? []),
+            new Init($dir, $domain, $params['msginit'] ?? []),
+            new Update($dir, $domain, $params['msgmerge'] ?? []),
+            new Compile($dir, $domain, $jsonDir, $params['msgfmt'] ?? []),
         ]);
     }
 

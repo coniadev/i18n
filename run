@@ -17,6 +17,21 @@ $runner = new Runner(I18n::commands(
         new Source(__DIR__ . '/tests/fixtures', '*.svelte', 'Python'),
     ],
     jsonDir: __DIR__ . '/tmp/json',
+    params: [
+        'xgettext' => [
+            '--force-po' => null,
+            '--copyright-holder' => '"ebene fünf GmbH"',
+        ],
+        'msginit' => [
+            '--no-translator' => null,
+        ],
+        'msgfmt' => [
+            '--check-header' => null,
+        ],
+        'msgmerge' => [
+            '--no-fuzzy-matching' => null,
+        ],
+    ]
 ));
 
 exit($runner->run());
