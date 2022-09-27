@@ -26,6 +26,7 @@ class I18n
     public static function setupGettext(string $locale, array $domains, string $default): void
     {
         MoTranslator\Loader::loadFunctions();
+        require_once __DIR__ . '/functions.php';
 
         _setlocale(LC_MESSAGES, $locale);
 
