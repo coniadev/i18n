@@ -1,0 +1,13 @@
+site_name: Conia Cli
+copyright: © 2022 ebene fünf GmbH
+nav:
+  - index.md
+theme:
+    name: conia
+repo_url: https://github.com/coniadev/i18n
+extra:
+    project: Conia i18n
+plugins:
+    - search
+    - macros:
+        module_name: docs/main
