@@ -85,6 +85,9 @@ $commands = I18n::commands(
         'msgfmt' => [
             '--check-header' => null,
         ],
+        'po2json' => [
+            'path' => '/path/to/po2json',
+        ]
     ]
 );
 

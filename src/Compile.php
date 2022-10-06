@@ -25,15 +25,15 @@ class Compile extends Command
 
     protected function getPo2Json(): string
     {
-        $script = 'node_modules/.bin/po2json';
+        $script = $this->params['po2json']['path'] ?? 'node_modules/.bin/po2json-gettextjs';
 
         if (is_file($script)) {
             return $script;
         }
 
-        $this->checkShellCommand('po2json');
+        $this->checkShellCommand('po2json-gettextjs');
 
-        return 'po2json';
+        return 'po2json-gettextjs';
     }
 
     public function run(): int
