@@ -42,8 +42,10 @@ class Compile extends Command
         $this->validateDir($this->dir);
         $this->validateDomain($this->domain);
 
+        $po2json = null;
+
         if ($this->jsonDir) {
-            $this->checkShellCommand('po2json');
+            $po2json = $this->getPo2Json();
             $this->validateDir($this->jsonDir);
         }
 
@@ -70,7 +72,7 @@ class Compile extends Command
 
             system($cmd . " $inputFile");
 
-            if ($jsonDir) {
+            if ($jsonDir && $po2json) {
                 $outFile = "$jsonDir/$locale/$domain.json";
                 $this->echo("Compile '$locale' json file for frontend\n");
                 $this->echo("  $outFile\n");
@@ -79,7 +81,7 @@ class Compile extends Command
                     mkdir("$jsonDir/$locale", 0755, true);
                 }
 
-                $cmd = $this->getPo2Json() .
+                $cmd = $po2json .
                     " $dir/$locale/LC_MESSAGES/$domain.po" .
                     " $outFile";
 
