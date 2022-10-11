@@ -37,6 +37,7 @@ class Extract extends Command
 
         $cmd = "find $srcdir" . $find . " '$glob' | xargs " .
             'xgettext' .
+            ' --force-po' .
             ' --from-code=UTF-8' .
             " --language=$language" .
             ($join ? ' --join-existing' : '') .
